@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 class CantStopExpress:
     def __init__(self):
@@ -63,6 +64,26 @@ class CantStopExpress:
 
         print(f"Winner: Player {winner+1}")
 
+    def calculate_chart_average(self):
+        """Calculate the average value of each box in the chart."""
+        chart_array = np.array(self.chart)
+        return np.mean(chart_array, axis=0)
+
+    def calculate_chart_expected_value(self):
+        """Calculate the expected value of each box in the chart."""
+        chart_array = np.array(self.chart)
+        return np.mean(chart_array * np.arange(1, 11), axis=0)
+
 # Create and play the game
 game = CantStopExpress()
 game.play_game()
+
+# Calculate the chart average and expected value
+chart_average = game.calculate_chart_average()
+chart_expected_value = game.calculate_chart_expected_value()
+
+print("Chart Average:")
+print(chart_average)
+
+print("Chart Expected Value:")
+print(chart_expected_value)
