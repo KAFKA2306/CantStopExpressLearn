@@ -33,7 +33,10 @@ class CantStopExpress:
 
     def game_over(self):
         """Check if the game is over."""
-        return any(sum(row) >= 8 for row in self.chart)
+        for player in range(3):
+            if sum(self.chart[player]) >= 8 or self.chart[player].count(1) >= 8:
+                return True
+        return False
 
     def print_chart(self):
         """Print the current state of the chart."""
