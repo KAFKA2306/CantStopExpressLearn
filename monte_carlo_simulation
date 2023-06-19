@@ -15,6 +15,7 @@ def calculate_score(turns=1):
             roll = roll_dice()
             unique_5th_numbers.append(sum(roll) - min(roll))
             turn_score -= 200  # penalty for the first four times of a value
+            print(f"Turn {i+1}, score: {turn_score}")
         # continue the game
         while len(unique_5th_numbers) != 0:
             roll = roll_dice()
@@ -29,6 +30,7 @@ def calculate_score(turns=1):
             else:
                 # plus points for at least six times of a value
                 turn_score += (roll_sum - 5) * 40
+            print(f"Turn {3 + len(unique_5th_numbers) + 1}, score: {turn_score}")
         total_score += turn_score
     return total_score
 
@@ -37,6 +39,7 @@ def monte_carlo_simulation(num_trials=10000):
     total_score = 0
     for _ in range(num_trials):
         total_score += calculate_score()
+        print(f"End of game {_ + 1}, total score: {total_score}")
     return total_score / num_trials
 
 expected_value = monte_carlo_simulation()
