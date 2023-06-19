@@ -34,7 +34,7 @@ def calculate_score(turns=1):
         total_score += turn_score
     return total_score
 
-def monte_carlo_simulation(num_trials=10000):
+def monte_carlo_simulation(num_trials=100):
     """Estimate the expected value of a game of Can't Stop Express."""
     total_score = 0
     for _ in range(num_trials):
