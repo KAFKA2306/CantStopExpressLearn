@@ -110,7 +110,6 @@ for i in range(5):
         print("Total Score:", total_score)
         print("---")
 
----
 #5th Dieは、各ゲームで３回出てくるはずです。
 #それぞれのペアが何点だったのかすべて出力してその和が得点です。
 #ルールについてご不明な点があれば、これ（https://github.com/KAFKA2306/CantStopExpressLearn/blob/main/GameRule.md）を参照してください。
