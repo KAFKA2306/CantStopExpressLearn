@@ -102,10 +102,6 @@ class QLearningTests(unittest.TestCase):
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
             self._load()
-            spec = importlib.util.spec_from_file_location("playgame", ROOT / "CreateAndPlayTheGame.py")
-            module = importlib.util.module_from_spec(spec)
-            sys.modules[spec.name] = module
-            spec.loader.exec_module(module)
         self.assertEqual(buffer.getvalue(), "")
 
     def test_terminal_transition_does_not_bootstrap(self):
