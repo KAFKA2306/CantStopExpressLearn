@@ -125,6 +125,17 @@ class QLearningTests(unittest.TestCase):
         self.assertEqual(set(results), {"random", "fixed", "q"})
         self.assertTrue(all(len(values) == 2 for values in results.values()))
 
+    def test_policy_comparison_evaluates_q_greedily(self):
+        module = self._load()
+        agent = module.QLearningAgent(module.TrainingConfig(epsilon=1.0, seed=7))
+        rng_state = agent._rng.getstate()
+
+        first = module.compare_policies([1, 2, 3], agent)
+        second = module.compare_policies([1, 2, 3], agent)
+
+        self.assertEqual(first["q"], second["q"])
+        self.assertEqual(agent._rng.getstate(), rng_state)
+
 
 if __name__ == "__main__":
     unittest.main()
