@@ -29,11 +29,9 @@ class QLearningAgent:
     def value(self, state, action):
         return self.q.get((state_key(state), action), 0.0)
 
-    def choose_action(self, state: GameState) -> Action:
+    def greedy_action(self, state: GameState) -> Action:
         if not state.legal_actions:
             raise ValueError("state has no legal actions")
-        if self._rng.random() < self.config.epsilon:
-            return self._rng.choice(state.legal_actions)
         return max(
             state.legal_actions,
             key=lambda action: (
@@ -42,6 +40,13 @@ class QLearningAgent:
                 -(action.fifth_value or 0),
             ),
         )
+
+    def choose_action(self, state: GameState) -> Action:
+        if not state.legal_actions:
+            raise ValueError("state has no legal actions")
+        if self._rng.random() < self.config.epsilon:
+            return self._rng.choice(state.legal_actions)
+        return self.greedy_action(state)
 
     def update(self, state, action, reward, next_state, terminated):
         current = self.value(state, action)
@@ -82,7 +87,7 @@ def compare_policies(seeds, q_agent: QLearningAgent):
         env = CantStopExpressEnv(seed=seed)
         results["fixed"].append(run_episode(env, lambda state: state.legal_actions[0]))
         env = CantStopExpressEnv(seed=seed)
-        results["q"].append(run_episode(env, q_agent.choose_action))
+        results["q"].append(run_episode(env, q_agent.greedy_action))
     return results
 
 
