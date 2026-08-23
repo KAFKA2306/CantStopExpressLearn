@@ -1,13 +1,10 @@
 import contextlib
-import importlib.util
+import importlib
 import io
-import pathlib
-import sys
 import unittest
 
 from cant_stop_express_env import Action, CantStopExpressEnv, enumerate_actions, total_score, winners
-
-ROOT = pathlib.Path(__file__).resolve().parents[1]
+import q_learning
 
 
 class EnvTests(unittest.TestCase):
@@ -91,47 +88,37 @@ class EnvTests(unittest.TestCase):
 
 
 class QLearningTests(unittest.TestCase):
-    def _load(self):
-        spec = importlib.util.spec_from_file_location("qlearning", ROOT / "Q-learning_algorithm.py")
-        module = importlib.util.module_from_spec(spec)
-        sys.modules[spec.name] = module
-        spec.loader.exec_module(module)
-        return module
-
     def test_import_is_silent(self):
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
-            self._load()
+            importlib.reload(q_learning)
         self.assertEqual(buffer.getvalue(), "")
 
     def test_terminal_transition_does_not_bootstrap(self):
-        module = self._load()
-        agent = module.QLearningAgent(
-            module.TrainingConfig(alpha=1.0, gamma=0.9, epsilon=0, seed=1)
+        agent = q_learning.QLearningAgent(
+            q_learning.TrainingConfig(alpha=1.0, gamma=0.9, epsilon=0, seed=1)
         )
         env = CantStopExpressEnv()
         state = env.reset(dice=[1, 2, 3, 4, 5])
         action = state.legal_actions[0]
         next_state, _, _, _, _ = env.step(action, next_dice=[1, 2, 3, 4, 6])
         for candidate in next_state.legal_actions:
-            agent.q[(module.state_key(next_state), candidate)] = 100.0
+            agent.q[(q_learning.state_key(next_state), candidate)] = 100.0
         agent.update(state, action, 7.0, next_state, True)
         self.assertEqual(agent.value(state, action), 7.0)
 
     def test_policy_comparison_uses_same_seed_set(self):
-        module = self._load()
-        agent = module.QLearningAgent(module.TrainingConfig(epsilon=0, seed=1))
-        results = module.compare_policies([1, 2], agent)
+        agent = q_learning.QLearningAgent(q_learning.TrainingConfig(epsilon=0, seed=1))
+        results = q_learning.compare_policies([1, 2], agent)
         self.assertEqual(set(results), {"random", "fixed", "q"})
         self.assertTrue(all(len(values) == 2 for values in results.values()))
 
     def test_policy_comparison_evaluates_q_greedily(self):
-        module = self._load()
-        agent = module.QLearningAgent(module.TrainingConfig(epsilon=1.0, seed=7))
+        agent = q_learning.QLearningAgent(q_learning.TrainingConfig(epsilon=1.0, seed=7))
         rng_state = agent._rng.getstate()
 
-        first = module.compare_policies([1, 2, 3], agent)
-        second = module.compare_policies([1, 2, 3], agent)
+        first = q_learning.compare_policies([1, 2, 3], agent)
+        second = q_learning.compare_policies([1, 2, 3], agent)
 
         self.assertEqual(first["q"], second["q"])
         self.assertEqual(agent._rng.getstate(), rng_state)
