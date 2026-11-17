@@ -161,6 +161,9 @@ class CantStopExpressEnv:
         legal = self.legal_actions()
         if action not in legal:
             raise ValueError("action is not legal for the current dice/state")
+        if next_dice is not None:
+            next_dice = tuple(next_dice)
+            self._validate_dice(next_dice)
         previous_score = total_score(self._pair_counts)
         for pair_sum in action.pair_sums:
             idx = pair_sum - 2
